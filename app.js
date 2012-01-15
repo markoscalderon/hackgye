@@ -44,8 +44,12 @@ app.get('/test', function(req,res){
 	redis.set('foo', 'bar');
 
 	redis.get('foo', function(err, value) {
-	  console.log('foo is: ' + value);
+		res.json({
+			foo: value
+		});
 	});
+	
+	
 });
 
 app.post('/register', function(req, res){
