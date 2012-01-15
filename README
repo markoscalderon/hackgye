@@ -1,0 +1,9 @@
+HackGye Site
+
+Install node.js and then the dependencies:
+
+npm install -d
+
+For run:
+
+node app.js
