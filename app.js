@@ -31,6 +31,25 @@ app.configure('production', function(){
 // Routes
 app.get('/', routes.index);
 
+app.get("/participants/total", function(req,res){
+	if (process.env.REDISTOGO_URL) {
+		//if you want to test locally and delete the IF
+		//var redis = require("redis").createClient();
+		
+		var rtg   = require("url").parse(process.env.REDISTOGO_URL);
+		var redis = require("redis").createClient(rtg.port, rtg.hostname);
+		redis.auth(rtg.auth.split(":")[1]);
+		
+		redis.llen("hackgye:registers",function(error,num){
+			res.json({
+				total: num
+			});
+		});
+	}else{
+		res.render("500");
+	}
+});
+
 app.post('/register', function(req, res){
 	var errors = [];
 	req.onValidationError(function(msg) {
@@ -60,16 +79,17 @@ app.post('/register', function(req, res){
 			var redis = require("redis").createClient(rtg.port, rtg.hostname);
 			redis.auth(rtg.auth.split(":")[1]);
 			
-			/* a hash with the details of the participant */
-			redis.hmset(email
-				,"fullname",fullname
-				,"email",email
-				,"twitter",twitter
-			);
 			
-			/* save a list of participants */
-			redis.lpush("registers", email);
-			
+			redis.incr( 'nextid' , function( err, id ) {
+				/* a hash with the details of the participant */
+				redis.hmset("hackgye:participant:" + id
+					,"fullname",fullname
+					,"email",email
+					,"twitter",twitter
+				);
+				/* save a list of participants */
+				redis.lpush("hackgye:registers", id);
+			}
 			
 		} 
 
