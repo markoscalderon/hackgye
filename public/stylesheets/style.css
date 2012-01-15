@@ -93,7 +93,6 @@ body{
 .clearer{
 	clear:both;
 }
-.errormsg{
+.notimsg{
 	width:200px;
-	color:red;
 }

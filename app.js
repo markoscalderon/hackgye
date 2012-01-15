@@ -63,7 +63,7 @@ app.post('/register', function(req, res){
 	req.assert('email', 'Email inválido').isEmail();
 	
 	if (errors.length) {
-		res.render('index', { msg: errors.join(',') });
+		res.render('index', { msg: "Error:" + errors.join(',') });
 	}
 	else{
 		var fullname = req.param('fullname');
@@ -89,7 +89,7 @@ app.post('/register', function(req, res){
 				);
 				/* save a list of participants */
 				redis.lpush("hackgye:registers", id);
-			}
+			});
 			
 		} 
 
