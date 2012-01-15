@@ -31,25 +31,27 @@ app.configure('production', function(){
 // Routes
 app.get('/', routes.index);
 
-app.get('/test', function(req,res){
-	
-	if (process.env.REDISTOGO_URL) {
-		var rtg   = require("url").parse(process.env.REDISTOGO_URL);
-		var redis = require("redis").createClient(rtg.port, rtg.hostname);
-		redis.auth(rtg.auth.split(":")[1]);
-	} else {
-		var redis = require("redis").createClient();
-	}
-	
-	redis.set('foo', 'bar');
-
-	redis.get('foo', function(err, value) {
-		res.json({
-			foo: value
-		});
+app.get('/test',function(req,res){
+	var email = require("mailer");
+	var sgusername = process.env.SENDGRID_USERNAME;
+	var sgpassword = process.env.SENDGRID_PASSWORD;
+	email.send({
+	    host : "smtp.sendgrid.net",
+	    port : "587",
+	    domain : "heroku.com",
+	    to : "mcmarkos86@gmail.com",
+	    from : "mcmarkos86@gmail.com",
+	    subject : "This is a subject",
+	    body: "Hello, this is a test body",
+	    authentication : "login",
+	    username : sgusername,
+	    password : sgpassword
+	  },
+	  function(err, result){
+	    if(err){
+	      console.log(err);
+	    }
 	});
-	
-	
 });
 
 app.post('/register', function(req, res){
@@ -68,11 +70,35 @@ app.post('/register', function(req, res){
 		res.render('index', { errors: errors.join(',') });
 	}
 	else{
-		res.json({
-			fullname: req.param('fullname'),
-			email: req.param('email'),
-			twitter: req.param('twitter')
-		});
+		var fullname = req.param('fullname');
+		var email = req.param('email');
+		var twitter = req.param('twitter');
+		
+		/* Saving the participant info */
+		if (process.env.REDISTOGO_URL) {
+			var rtg   = require("url").parse(process.env.REDISTOGO_URL);
+			var redis = require("redis").createClient(rtg.port, rtg.hostname);
+			redis.auth(rtg.auth.split(":")[1]);
+			
+			/* a hash with the details of the participant */
+			redis.hmset(email
+				,"fullname",fullname
+				,"email",email
+				,"twitter",twitter
+			);
+			
+			/* save a list of participants */
+			redis.lpush("registers", email);
+			
+			
+		} else {
+			//if you want to test locally
+			//var redis = require("redis").createClient();
+		}
+
+		/* send an email to the admins with the new register */
+		
+		
 	}
 });
 
