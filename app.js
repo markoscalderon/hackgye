@@ -31,29 +31,6 @@ app.configure('production', function(){
 // Routes
 app.get('/', routes.index);
 
-app.get('/test',function(req,res){
-	var email = require("mailer");
-	var sgusername = process.env.SENDGRID_USERNAME;
-	var sgpassword = process.env.SENDGRID_PASSWORD;
-	email.send({
-	    host : "smtp.sendgrid.net",
-	    port : "587",
-	    domain : "heroku.com",
-	    to : "mcmarkos86@gmail.com",
-	    from : "mcmarkos86@gmail.com",
-	    subject : "This is a subject",
-	    body: "Hello, this is a test body",
-	    authentication : "login",
-	    username : sgusername,
-	    password : sgpassword
-	  },
-	  function(err, result){
-	    if(err){
-	      console.log(err);
-	    }
-	});
-});
-
 app.post('/register', function(req, res){
 	var errors = [];
 	req.onValidationError(function(msg) {
@@ -67,7 +44,7 @@ app.post('/register', function(req, res){
 	req.assert('email', 'Email inválido').isEmail();
 	
 	if (errors.length) {
-		res.render('index', { errors: errors.join(',') });
+		res.render('index', { msg: errors.join(',') });
 	}
 	else{
 		var fullname = req.param('fullname');
@@ -76,6 +53,9 @@ app.post('/register', function(req, res){
 		
 		/* Saving the participant info */
 		if (process.env.REDISTOGO_URL) {
+			//if you want to test locally and delete the IF
+			//var redis = require("redis").createClient();
+			
 			var rtg   = require("url").parse(process.env.REDISTOGO_URL);
 			var redis = require("redis").createClient(rtg.port, rtg.hostname);
 			redis.auth(rtg.auth.split(":")[1]);
@@ -91,13 +71,33 @@ app.post('/register', function(req, res){
 			redis.lpush("registers", email);
 			
 			
-		} else {
-			//if you want to test locally
-			//var redis = require("redis").createClient();
-		}
+		} 
 
 		/* send an email to the admins with the new register */
+		if (process.env.SENDGRID_USERNAME) {
+			var mailer = require("mailer");
+			var sgusername = process.env.SENDGRID_USERNAME;
+			var sgpassword = process.env.SENDGRID_PASSWORD;
+			mailer.send({
+		    	host : "smtp.sendgrid.net",
+		    	port : "587",
+		    	domain : "heroku.com",
+		    	to : "mcmarkos86@gmail.com",
+		    	from : "noreply@hackgye.com",
+		    	subject : "Un nuevo registro para el HackGye",
+		    	body: "Nombre:"+fullname+",Email:"+email+",Twitter:"+twitter,
+		    	authentication : "login",
+		    	username : sgusername,
+		    	password : sgpassword
+		  	},
+		  	function(err, result){
+		    	if(err){
+		      		console.log(err);
+		    	}
+			});
+		}
 		
+		res.render('index', { msg: "registro exitoso!" });
 		
 	}
 });

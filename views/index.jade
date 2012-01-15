@@ -25,7 +25,7 @@
 					input(type="text",id="twitter",name="twitter")
 				div(class="submit")
 					input(type="submit", value="Enviar")
-				- if ( typeof(errors) != 'undefined' )
+				- if ( typeof(msg) != 'undefined' )
 					div
-						p(class="errormsg") Error: #{errors}
+						p(class="errormsg") Error: #{msg}
 		.clearer
