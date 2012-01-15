@@ -1,0 +1,28 @@
+#wrapper
+	#info
+		#side1
+			img(src = "/images/hackgye2.png")
+			h3 ¿Qué es?
+			br
+			p Un hackathon es un espacio colaborativo de desarrollo de software con una temática ó problema a resolver, los programadores se reunen en un lugar, se conocen entre ellos, arman equipos y comienzan a trabajar.
+			br
+			ul
+				li(class = "date") fecha
+				li(class = "time") hora
+				li(class = "place") lugar
+				
+		#side2
+			h3 Registro
+			form
+				div
+					label Nombre:
+					input(type="text",id="nombre")
+				div
+					label Email:
+					input(type="text",id="email")
+				div
+					label Sitio:
+					input(type="text",id="site")
+				div(class="submit")
+					input(type="button", value="Enviar")
+		.clearer
