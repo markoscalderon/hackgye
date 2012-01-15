@@ -93,3 +93,7 @@ body{
 .clearer{
 	clear:both;
 }
+.errormsg{
+	width:200px;
+	color:red;
+}

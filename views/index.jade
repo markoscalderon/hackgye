@@ -13,16 +13,19 @@
 				
 		#side2
 			h3 Registro
-			form
+			form(action="/register",method="post")
 				div
-					label Nombre:
-					input(type="text",id="nombre")
+					label * Nombre:
+					input(type="text",id="fullname",name="fullname")
 				div
-					label Email:
-					input(type="text",id="email")
+					label * Email:
+					input(type="text",id="email",name="email")
 				div
-					label Sitio:
-					input(type="text",id="site")
+					label Twitter: @
+					input(type="text",id="twitter",name="twitter")
 				div(class="submit")
-					input(type="button", value="Enviar")
+					input(type="submit", value="Enviar")
+				- if ( typeof(errors) != 'undefined' )
+					div
+						p(class="errormsg") Error: #{errors}
 		.clearer
